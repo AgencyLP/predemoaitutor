@@ -52,11 +52,44 @@
   <div id="view-upload" class="page hidden">
     <div class="upload-card">
       <h2>Ready to Learn?</h2>
-      <p class="upload-copy">Upload one file to simulate your pre-demo tutor flow.</p>
+      <p class="upload-copy">Set your study preferences, then upload one file to test the tutor.</p>
+
+      <div class="personalize-grid">
+        <div class="field-group">
+          <label for="subjectSelect">Subject</label>
+          <select id="subjectSelect">
+            <option value="Law">Law</option>
+            <option value="Medicine">Medicine</option>
+            <option value="Business">Business</option>
+            <option value="Economics">Economics</option>
+            <option value="Science">Science</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="levelSelect">Level</label>
+          <select id="levelSelect">
+            <option value="Undergrad">Undergrad</option>
+            <option value="Postgrad">Postgrad</option>
+            <option value="High School">High School</option>
+            <option value="Professional">Professional</option>
+          </select>
+        </div>
+
+        <div class="field-group full-width">
+          <label for="styleSelect">Learning style</label>
+          <select id="styleSelect">
+            <option value="Explain simply, then quiz me">Explain simply, then quiz me</option>
+            <option value="Talk me through it back and forth">Talk me through it back and forth</option>
+            <option value="Give me the big picture first, then details">Give me the big picture first, then details</option>
+          </select>
+        </div>
+      </div>
 
       <label for="fileInput" class="upload-dropzone">
-        <span>Click to upload PDF, slides, or notes</span>
-        <small>For demo UI only</small>
+        <span>Click to upload PDF, slides, notes, or images</span>
+        <small>For pre-demo testing</small>
       </label>
       <input id="fileInput" type="file" hidden />
 
@@ -71,7 +104,7 @@
     <div class="loader-wrap">
       <div class="loader"></div>
       <h3>Processing your materials...</h3>
-      <p>Reading file, extracting text, and preparing your lesson.</p>
+      <p>Reading file, extracting text, checking visuals, and preparing your lesson.</p>
     </div>
   </div>
 
@@ -81,8 +114,8 @@
 
       <div class="top-bar">
         <div>
-          <div class="mini-label">Current Tab</div>
-          <div class="top-title">Lesson 1 Demo</div>
+          <div class="mini-label">Current Lesson</div>
+          <div class="top-title">AI Tutor Demo</div>
         </div>
 
         <div class="top-actions">
@@ -95,25 +128,27 @@
         <div class="lesson-card">
           <div class="lesson-header">
             <span class="lesson-tag">AI Tutor</span>
-            <span class="lesson-status">Teaching chunk 1</span>
+            <span class="lesson-status" id="lessonStatus">Teaching chunk</span>
           </div>
 
-          <div id="typedLesson" class="typed-lesson"></div>
-
-          <div id="diagramBox" class="diagram-box hidden">
-            <div class="diagram-title">Simple diagram</div>
-            <div class="diagram-flow">
-              <div class="diagram-node">Offer</div>
-              <div class="diagram-arrow">→</div>
-              <div class="diagram-node">Acceptance</div>
-              <div class="diagram-arrow">→</div>
-              <div class="diagram-node active">Consideration</div>
+          <div class="lesson-main">
+            <div class="lesson-text-wrap">
+              <div id="typedLesson" class="typed-lesson"></div>
             </div>
           </div>
+
+          <div id="diagramBox" class="diagram-box hidden"></div>
 
           <div class="question-box">
             <div class="question-label">Quick check</div>
             <p id="questionText">Why is consideration important in contract formation?</p>
+          </div>
+
+          <div id="feedbackBox" class="feedback-box hidden"></div>
+
+          <div id="decisionRow" class="decision-row hidden">
+            <button id="teachMoreBtn" class="secondary-btn">Teach me more</button>
+            <button id="moveOnBtn" class="main-btn small-main-btn">Move on</button>
           </div>
         </div>
       </div>
@@ -123,12 +158,12 @@
           <input id="answerInput" type="text" placeholder="Type your answer here..." />
           <button class="ask-btn" id="sendBtn">Send</button>
         </div>
-
-        <div id="feedbackBox" class="feedback-box hidden"></div>
       </div>
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script type="module" src="voice.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
