@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Learna | Study Smarter, Not Harder</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="view-hero" class="page hero-page">
+    <div class="hero">
+      <div class="badge">Live AI Tutoring</div>
+
+      <h1 class="title">
+        Upload your
+        <div class="spinner">
+          <div class="words">
+            <span class="word">PDFs</span>
+            <span class="word">Slides</span>
+            <span class="word">Notes</span>
+            <span class="word">Diagrams</span>
+            <span class="word">Answers</span>
+          </div>
+        </div>
+        and actually learn them.
+      </h1>
+
+      <p class="subtitle">
+        Drop in your study materials. Our AI reads everything, breaks it down,
+        and teaches you step-by-step — then checks you actually understand.
+      </p>
+
+      <div class="promise">
+        <span>Cut days of studying down to just a few hours.</span>
+      </div>
+
+      <div class="cta-group">
+        <button class="main-btn" id="startBtn">Start Learning</button>
+        <div class="social-proof">200+ students already signed up</div>
+      </div>
+
+      <div class="features">
+        <div class="pill">Reads any file type</div>
+        <div class="pill">Adapts to your level</div>
+        <div class="pill">Tests your understanding</div>
+        <div class="pill">Teaches chunk by chunk</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-upload" class="page hidden">
+    <div class="upload-card">
+      <h2>Ready to Learn?</h2>
+      <p class="upload-copy">Upload one file to simulate your pre-demo tutor flow.</p>
+
+      <label for="fileInput" class="upload-dropzone">
+        <span>Click to upload PDF, slides, or notes</span>
+        <small>For demo UI only</small>
+      </label>
+      <input id="fileInput" type="file" hidden />
+
+      <div id="fileName" class="file-name hidden"></div>
+
+      <button class="action-btn" id="processBtn" disabled>Process Materials</button>
+      <button class="text-btn" id="backBtn">Back</button>
+    </div>
+  </div>
+
+  <div id="view-loading" class="page hidden">
+    <div class="loader-wrap">
+      <div class="loader"></div>
+      <h3>Processing your materials...</h3>
+      <p>Reading file, extracting text, and preparing your lesson.</p>
+    </div>
+  </div>
+
+  <div id="view-whiteboard" class="page hidden whiteboard-page">
+    <div class="board-surface">
+      <div class="grid-layer"></div>
+
+      <div class="top-bar">
+        <div>
+          <div class="mini-label">Current Tab</div>
+          <div class="top-title">Lesson 1 Demo</div>
+        </div>
+
+        <div class="top-actions">
+          <button class="secondary-btn" id="voiceBtn">🔊 Read summary</button>
+          <button class="secondary-btn" id="resetBtn">Reset demo</button>
+        </div>
+      </div>
+
+      <div class="board-content">
+        <div class="lesson-card">
+          <div class="lesson-header">
+            <span class="lesson-tag">AI Tutor</span>
+            <span class="lesson-status">Teaching chunk 1</span>
+          </div>
+
+          <div id="typedLesson" class="typed-lesson"></div>
+
+          <div id="diagramBox" class="diagram-box hidden">
+            <div class="diagram-title">Simple diagram</div>
+            <div class="diagram-flow">
+              <div class="diagram-node">Offer</div>
+              <div class="diagram-arrow">→</div>
+              <div class="diagram-node">Acceptance</div>
+              <div class="diagram-arrow">→</div>
+              <div class="diagram-node active">Consideration</div>
+            </div>
+          </div>
+
+          <div class="question-box">
+            <div class="question-label">Quick check</div>
+            <p id="questionText">Why is consideration important in contract formation?</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tutor-panel">
+        <div class="ask-input">
+          <input id="answerInput" type="text" placeholder="Type your answer here..." />
+          <button class="ask-btn" id="sendBtn">Send</button>
+        </div>
+
+        <div id="feedbackBox" class="feedback-box hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
