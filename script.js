@@ -16,6 +16,7 @@ const levelSelect = document.getElementById("levelSelect");
 const styleSelect = document.getElementById("styleSelect");
 
 const typedLesson = document.getElementById("typedLesson");
+const lessonExtras = document.getElementById("lessonExtras");
 const questionText = document.getElementById("questionText");
 const diagramBox = document.getElementById("diagramBox");
 const answerInput = document.getElementById("answerInput");
@@ -71,7 +72,7 @@ function buildHighlightedHTML(text, words) {
 function buildLessonMainHTML(plan) {
   const lessonText = plan?.lessonText || "No lesson generated.";
   const highlights = plan?.highlights || [];
-  return `<p>${buildHighlightedHTML(lessonText, highlights)}</p>`;
+  return buildHighlightedHTML(lessonText, highlights);
 }
 
 function buildLessonExtrasHTML(plan) {
@@ -124,26 +125,30 @@ function updateLessonStatus(extra = "") {
   lessonStatus.textContent = extra ? `${base} · ${extra}` : base;
 }
 
-function typeHTML(element, plainText, finalHtml, speed = 22) {
+function typeLessonText(element, text, onDone, speed = 18) {
   if (typeTimer) {
     clearInterval(typeTimer);
     typeTimer = null;
   }
 
-  element.innerHTML = "";
+  element.textContent = "";
   let i = 0;
 
   typeTimer = setInterval(() => {
-    element.textContent = plainText.slice(0, i);
-    i += 2;
+    i += 1;
+    element.textContent = text.slice(0, i);
 
-    if (i > plainText.length) {
+    if (i >= text.length) {
       clearInterval(typeTimer);
       typeTimer = null;
-      element.innerHTML = finalHtml;
+
+      if (typeof onDone === "function") {
+        onDone();
+      }
     }
   }, speed);
 }
+
 
 function renderDiagram(plan) {
   const showDiagram = !!plan?.showDiagram && plan?.diagramTemplate !== "none";
@@ -226,7 +231,6 @@ function renderDiagram(plan) {
 function startTutorDemo(plan, statusText = "") {
   const question = plan?.question || "What is the main idea here?";
   const mainPlainText = plan?.lessonText || "No lesson generated.";
-  const finalHtml = `${buildLessonMainHTML(plan)}${buildLessonExtrasHTML(plan)}`;
 
   questionText.textContent = question;
   feedbackBox.classList.add("hidden");
@@ -235,9 +239,14 @@ function startTutorDemo(plan, statusText = "") {
   hideDecisionRow();
   updateLessonStatus(statusText);
 
-  typedLesson.style.minHeight = "";
+  typedLesson.textContent = "";
+  lessonExtras.innerHTML = "";
   renderDiagram(plan);
-  typeHTML(typedLesson, mainPlainText, finalHtml, 22);
+
+  typeLessonText(typedLesson, mainPlainText, () => {
+    typedLesson.innerHTML = buildLessonMainHTML(plan);
+    lessonExtras.innerHTML = buildLessonExtrasHTML(plan);
+  });
 }
 
 startBtn.addEventListener("click", () => {
@@ -574,6 +583,11 @@ voiceBtn.addEventListener("click", async () => {
 
 resetBtn.addEventListener("click", () => {
   window.speechSynthesis.cancel();
+
+  if (typeTimer) {
+  clearInterval(typeTimer);
+  typeTimer = null;
+}
 
   if (window.freeVoice?.stop) {
     window.freeVoice.stop();
