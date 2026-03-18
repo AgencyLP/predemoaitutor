@@ -75,38 +75,76 @@ function buildLessonMainHTML(plan) {
   return buildHighlightedHTML(lessonText, highlights);
 }
 
-function buildLessonExtrasHTML(plan) {
+function buildExampleHTML(plan) {
   const highlights = plan?.highlights || [];
   const exampleTitle = plan?.exampleTitle || "";
   const exampleText = plan?.exampleText || "";
+
+  if (!exampleText) return "";
+
+  return `
+    <div class="example-box">
+      ${exampleTitle ? `<div class="example-title">${escapeHtml(exampleTitle)}</div>` : ""}
+      <div class="example-text">${buildHighlightedHTML(exampleText, highlights)}</div>
+    </div>
+  `;
+}
+
+function buildSupportHTML(plan) {
+  const highlights = plan?.highlights || [];
   const supportBoxTitle = plan?.supportBoxTitle || "";
   const supportBoxItems = Array.isArray(plan?.supportBoxItems) ? plan.supportBoxItems : [];
 
-  const exampleHtml =
-    exampleTitle && exampleText
-      ? `
-        <div class="example-box">
-          <div class="example-title">${escapeHtml(exampleTitle)}</div>
-          <div class="example-text">${buildHighlightedHTML(exampleText, highlights)}</div>
-        </div>
-      `
-      : "";
+  if (!supportBoxTitle || !supportBoxItems.length) return "";
 
-  const supportHtml =
-    supportBoxTitle && supportBoxItems.length
-      ? `
-        <div class="guided-steps-wrap">
-          <div class="guided-steps-title">${escapeHtml(supportBoxTitle)}</div>
-          <ol class="guided-steps-list">
-            ${supportBoxItems
-              .map((item) => `<li>${buildHighlightedHTML(item, highlights)}</li>`)
-              .join("")}
-          </ol>
-        </div>
-      `
-      : "";
+  return `
+    <div class="guided-steps-wrap">
+      <div class="guided-steps-title">${escapeHtml(supportBoxTitle)}</div>
+      <ol class="guided-steps-list">
+        ${supportBoxItems
+          .map((item) => `<li>${buildHighlightedHTML(item, highlights)}</li>`)
+          .join("")}
+      </ol>
+    </div>
+  `;
+}
 
-  return `${exampleHtml}${supportHtml}`;
+function buildSupportHTML(plan) {
+  const highlights = plan?.highlights || [];
+  const supportBoxTitle = plan?.supportBoxTitle || "";
+  const supportBoxItems = Array.isArray(plan?.supportBoxItems) ? plan.supportBoxItems : [];
+
+  if (!supportBoxTitle || !supportBoxItems.length) return "";
+
+  return `
+    <div class="guided-steps-wrap">
+      <div class="guided-steps-title">${escapeHtml(supportBoxTitle)}</div>
+      <ol class="guided-steps-list">
+        ${supportBoxItems
+          .map((item) => `<li>${buildHighlightedHTML(item, highlights)}</li>`)
+          .join("")}
+      </ol>
+    </div>
+  `;
+}
+
+function buildSupportHTML(plan) {
+  const highlights = plan?.highlights || [];
+  const supportBoxTitle = plan?.supportBoxTitle || "";
+  const supportBoxItems = Array.isArray(plan?.supportBoxItems) ? plan.supportBoxItems : [];
+
+  if (!supportBoxTitle || !supportBoxItems.length) return "";
+
+  return `
+    <div class="guided-steps-wrap">
+      <div class="guided-steps-title">${escapeHtml(supportBoxTitle)}</div>
+      <ol class="guided-steps-list">
+        ${supportBoxItems
+          .map((item) => `<li>${buildHighlightedHTML(item, highlights)}</li>`)
+          .join("")}
+      </ol>
+    </div>
+  `;
 }
 
 function hideDecisionRow() {
@@ -125,28 +163,54 @@ function updateLessonStatus(extra = "") {
   lessonStatus.textContent = extra ? `${base} · ${extra}` : base;
 }
 
-function typeLessonText(element, text, onDone, speed = 18) {
+function typeLessonText(element, text, onDone, speed = 55) {
   if (typeTimer) {
     clearInterval(typeTimer);
     typeTimer = null;
   }
 
-  element.textContent = "";
+  const words = (text || "").split(/\s+/).filter(Boolean);
   let i = 0;
 
-  typeTimer = setInterval(() => {
-    i += 1;
-    element.textContent = text.slice(0, i);
+  console.log("[TYPE] start", {
+    totalWords: words.length,
+    speed,
+    textPreview: text.slice(0, 120)
+  });
 
-    if (i >= text.length) {
+  element.textContent = "";
+
+  typeTimer = setInterval(() => {
+    if (i >= words.length) {
       clearInterval(typeTimer);
       typeTimer = null;
+      console.log("[TYPE] done", {
+        finalWordCount: words.length,
+        finalTextLength: element.textContent.length
+      });
 
       if (typeof onDone === "function") {
+        console.log("[TYPE] calling onDone");
         onDone();
       }
+      return;
     }
+
+    if (i === 0 || i === 10 || i === 20 || i === 30 || i === 40 || i === 50 || i === words.length - 1) {
+      console.log("[TYPE] tick", {
+        i,
+        nextWord: words[i],
+        currentRenderedLength: element.textContent.length
+      });
+    }
+
+    element.textContent += (i === 0 ? "" : " ") + words[i];
+    i += 1;
   }, speed);
+}
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 
@@ -232,6 +296,17 @@ function startTutorDemo(plan, statusText = "") {
   const question = plan?.question || "What is the main idea here?";
   const mainPlainText = plan?.lessonText || "No lesson generated.";
 
+  console.log("[LESSON] startTutorDemo called", {
+    question,
+    lessonTextLength: mainPlainText.length,
+    exampleTitle: plan?.exampleTitle,
+    exampleTextLength: plan?.exampleText?.length || 0,
+    supportBoxTitle: plan?.supportBoxTitle,
+    supportItemsCount: Array.isArray(plan?.supportBoxItems) ? plan.supportBoxItems.length : 0,
+    showDiagram: plan?.showDiagram,
+    diagramTemplate: plan?.diagramTemplate
+  });
+
   questionText.textContent = question;
   feedbackBox.classList.add("hidden");
   feedbackBox.textContent = "";
@@ -241,11 +316,44 @@ function startTutorDemo(plan, statusText = "") {
 
   typedLesson.textContent = "";
   lessonExtras.innerHTML = "";
-  renderDiagram(plan);
+  diagramBox.innerHTML = "";
+  diagramBox.classList.add("hidden");
 
-  typeLessonText(typedLesson, mainPlainText, () => {
-    typedLesson.innerHTML = buildLessonMainHTML(plan);
-    lessonExtras.innerHTML = buildLessonExtrasHTML(plan);
+  console.log("[LESSON] before typeLessonText");
+
+  typeLessonText(typedLesson, mainPlainText, async () => {
+    console.log("[LESSON] onDone entered", {
+      typedTextLength: typedLesson.textContent.length,
+      typedPreview: typedLesson.textContent.slice(0, 120)
+    });
+
+    const exampleHtml = buildExampleHTML(plan);
+    const supportHtml = buildSupportHTML(plan);
+
+    console.log("[LESSON] built extras", {
+      exampleHtmlLength: exampleHtml.length,
+      supportHtmlLength: supportHtml.length
+    });
+
+    await wait(250);
+
+    if (exampleHtml) {
+      lessonExtras.innerHTML = exampleHtml;
+      console.log("[LESSON] example injected");
+      await wait(220);
+    }
+
+    if (supportHtml) {
+      lessonExtras.innerHTML += supportHtml;
+      console.log("[LESSON] support injected");
+      await wait(220);
+    }
+
+    renderDiagram(plan);
+    console.log("[LESSON] renderDiagram finished", {
+      diagramHidden: diagramBox.classList.contains("hidden"),
+      diagramHTMLLength: diagramBox.innerHTML.length
+    });
   });
 }
 

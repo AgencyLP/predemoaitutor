@@ -834,8 +834,20 @@ body::after {
   line-height: 1.5;
 }
 
+.lesson-fade-item {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.lesson-fade-item.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .lesson-extras {
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
+  margin-top: 0.9rem;
 }
